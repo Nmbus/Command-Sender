@@ -4,53 +4,47 @@ from logic import dataDB, queryColumn, ejecutarComandos, ipList
 
 st.set_page_config(page_title="Gestión de Equipos", layout="wide")
 
-# CSS: tema oscuro, borde blanco en los filtros, y "modo nuclear" para el cursor
 st.markdown(
     """
     <style>
-    /* Fondo general */
     [data-testid="stAppViewContainer"] {
-        background-color: #1A1A1A !important;  
+        background: linear-gradient(to right, #FF5C00, #F47C2E) !important;
+        margin: 0;
+        padding: 0;
     }
-    /* Header/toolbar transparente */
+
+
     [data-testid="stHeader"], [data-testid="stToolbar"] {
         background: none !important;
     }
-    /* Contenedor principal */
+
     .block-container {
-        background-color: #2A2A2A !important;
-        color: #FFFFFF !important;
+        background-color: #FFFFFF !important; /* Fondo blanco */
+        color: #333333 !important;           /* Texto gris oscuro */
         padding: 2rem !important;
         border-radius: 8px !important;
         margin: 2rem auto !important;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1) !important; /* Sombra suave */
     }
-    /* Títulos en naranja */
+
     h1, h2, h3, h4, h5, h6 {
         color: #FF5C00 !important;
         font-weight: 700 !important;
     }
-    hr {
-        border: none;
-        height: 2px;
-        background-color: #FF5C00 !important;
-    }
-    /* Inputs: fondo oscuro, borde blanco */
+
     input, textarea, select {
-        background-color: #3A3A3A !important; 
-        color: #FFFFFF !important;
-        border: 1px solid #FFFFFF !important; 
+        background-color: #FFFFFF !important;
+        color: #333333 !important;
+        border: 1px solid #FF5C00 !important;
     }
-    /* 
-       Modo nuclear: desactiva eventos y caret en el input del selectbox
-       -> Se pierde la búsqueda interna
-    */
-    .stSelectbox input[type="text"] {
-        caret-color: transparent !important;
-        pointer-events: none !important; /* Desactiva escritura */
-        outline: none !important;
-        box-shadow: none !important;
+    .stTextInput>div>div>input,
+    .stTextArea>div>textarea,
+    .stSelectbox>div>div>div>button {
+        background-color: #FFFFFF !important;
+        color: #333333 !important;
+        border: 1px solid #FF5C00 !important;
     }
-    /* Botones en naranja */
+
     .stButton>button {
         background-color: #FF5C00 !important;
         color: #FFFFFF !important;
@@ -61,16 +55,16 @@ st.markdown(
         background-color: #F47C2E !important;
         color: #FFFFFF !important;
     }
-    /* Tabla */
+
     .dataframe thead th {
-        background-color: #FF5C00 !important;
+        background: linear-gradient(to right, #FF5C00, #F47C2E) !important;
         color: #FFFFFF !important;
     }
     .dataframe tbody tr:nth-child(even) {
-        background-color: #2F2F2F !important;
+        background-color: #f9f9f9 !important;
     }
     .dataframe tbody tr:nth-child(odd) {
-        background-color: #3A3A3A !important;
+        background-color: #ffffff !important;
     }
     .dataframe td, .dataframe th {
         border: 1px solid #FF5C00 !important;
@@ -119,6 +113,7 @@ def select_with_index(label, options, key):
     return st.selectbox(label, options=options, index=idx, key=key)
 
 def render():
+    # Inicialización de variables de sesión
     for key in ["tipo_equipo", "CIUDAD", "NODO", "hostname", "IP_DCN", "Vendor", "OS_TYPE", "Modelo"]:
         if key not in st.session_state:
             st.session_state[key] = "Todos" if key != "tipo_equipo" else "Switches"
@@ -210,8 +205,9 @@ def render():
     
     if ejecutar and comandos_str:
         comandos = [line.strip() for line in comandos_str.splitlines() if line.strip()]
-        vendor_value = st.session_state["Vendor"]
-        vendor_ssh = vendor_value.lower() if vendor_value != "Todos" else "cisco"
+        # Ajustamos la referencia a "vendor" para evitar error si no existe:
+        vendor_val = st.session_state["Vendor"]
+        vendor_ssh = vendor_val.lower() if vendor_val != "Todos" else "cisco"
         resultados_comandos = ejecutarComandos(ipList, comandos, vendor_default=vendor_ssh)
     
     with col_execution:
@@ -225,6 +221,7 @@ def render():
                         st.text(salida)
                 else:
                     st.text(cmds)
+
 
 if __name__ == '__main__':
     render()
